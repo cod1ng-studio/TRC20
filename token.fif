@@ -1,0 +1,606 @@
+// automatically generated from `/Users/tolyayanot/lite-client/crypto/smartcont/stdlib.fc` `msg_hex_comment.fc` `TRC20/token.fc` 
+PROGRAM{
+  85643 DECLMETHOD str2bin
+  DECLPROC parse_msg
+  DECLPROC clone_slice
+  DECLPROC pack_addr
+  DECLPROC load_data
+  DECLPROC store_data
+  DECLPROC _get_balance
+  DECLPROC ~set_balance
+  DECLPROC _get_allowance
+  DECLPROC ~set_allowance
+  DECLPROC send_message_back
+  DECLPROC recv_internal
+  DECLPROC recv_external
+  107853 DECLMETHOD get_name
+  72444 DECLMETHOD get_symbol
+  106049 DECLMETHOD get_decimals
+  122870 DECLMETHOD get_total_supply
+  112966 DECLMETHOD balance_of
+  82759 DECLMETHOD allowance
+  77102 DECLMETHOD ibalance_of
+  77150 DECLMETHOD iallowance
+  124838 DECLMETHOD test_recv_external
+  90191 DECLMETHOD test_recv_internal
+  str2bin PROC:<{
+    NEWC
+    OVER
+    SBITS
+    3 RSHIFT#
+    0 PUSHINT
+    WHILE:<{
+      s0 s1 PUSH2
+      LESS
+    }>DO<{
+      s0 s3 XCHG
+      8 LDU
+      OVER
+      48 EQINT
+      IF:<{
+        NIP
+        0 PUSHINT
+        s0 s3 XCHG2
+        4 STU
+      }>ELSE<{
+        OVER
+        49 EQINT
+        IF:<{
+          NIP
+          1 PUSHINT
+          s0 s3 XCHG2
+          4 STU
+        }>ELSE<{
+          OVER
+          50 EQINT
+          IF:<{
+            NIP
+            2 PUSHINT
+            s0 s3 XCHG2
+            4 STU
+          }>ELSE<{
+            OVER
+            51 EQINT
+            IF:<{
+              NIP
+              3 PUSHINT
+              s0 s3 XCHG2
+              4 STU
+            }>ELSE<{
+              OVER
+              52 EQINT
+              IF:<{
+                NIP
+                4 PUSHINT
+                s0 s3 XCHG2
+                4 STU
+              }>ELSE<{
+                OVER
+                53 EQINT
+                IF:<{
+                  NIP
+                  5 PUSHINT
+                  s0 s3 XCHG2
+                  4 STU
+                }>ELSE<{
+                  OVER
+                  54 EQINT
+                  IF:<{
+                    NIP
+                    6 PUSHINT
+                    s0 s3 XCHG2
+                    4 STU
+                  }>ELSE<{
+                    OVER
+                    55 EQINT
+                    IF:<{
+                      NIP
+                      7 PUSHINT
+                      s0 s3 XCHG2
+                      4 STU
+                    }>ELSE<{
+                      OVER
+                      56 EQINT
+                      IF:<{
+                        NIP
+                        8 PUSHINT
+                        s0 s3 XCHG2
+                        4 STU
+                      }>ELSE<{
+                        OVER
+                        57 EQINT
+                        IF:<{
+                          NIP
+                          9 PUSHINT
+                          s0 s3 XCHG2
+                          4 STU
+                        }>ELSE<{
+                          OVER
+                          65 EQINT
+                          IF:<{
+                            NIP
+                            10 PUSHINT
+                            s0 s3 XCHG2
+                            4 STU
+                          }>ELSE<{
+                            OVER
+                            66 EQINT
+                            IF:<{
+                              NIP
+                              11 PUSHINT
+                              s0 s3 XCHG2
+                              4 STU
+                            }>ELSE<{
+                              OVER
+                              67 EQINT
+                              IF:<{
+                                NIP
+                                12 PUSHINT
+                                s0 s3 XCHG2
+                                4 STU
+                              }>ELSE<{
+                                OVER
+                                68 EQINT
+                                IF:<{
+                                  NIP
+                                  13 PUSHINT
+                                  s0 s3 XCHG2
+                                  4 STU
+                                }>ELSE<{
+                                  OVER
+                                  69 EQINT
+                                  IF:<{
+                                    NIP
+                                    14 PUSHINT
+                                    s0 s3 XCHG2
+                                    4 STU
+                                  }>ELSE<{
+                                    SWAP
+                                    70 EQINT
+                                    IF:<{
+                                      15 PUSHINT
+                                      s0 s3 XCHG2
+                                      4 STU
+                                    }>ELSE<{
+                                      s0 s2 XCHG
+                                    }>
+                                  }>
+                                }>
+                              }>
+                            }>
+                          }>
+                        }>
+                      }>
+                    }>
+                  }>
+                }>
+              }>
+            }>
+          }>
+        }>
+      }>
+      s0 s3 XCHG
+      INC
+      s2 s3 XCHG
+    }>
+    s2 s3 XCHG
+    3 BLKDROP
+    ENDC
+    CTOS
+  }>
+  parse_msg PROC:<{
+    DUP
+    SBITS
+    NEWC
+    s3 PUSH
+    0 GTINT
+    IFJMP:<{
+      -ROT
+      LDSLICEX
+      -ROT
+      STSLICER
+      OVER
+      SREFS
+      0 GTINT
+      IF:<{
+        SWAP
+        LDREF
+        DROP
+        CTOS
+        STSLICER
+      }>ELSE<{
+        NIP
+      }>
+      ENDC
+      CTOS
+    }>
+    s3 POP
+    LDSLICEX
+    SWAP
+    str2bin CALLDICT
+    s1 s2 XCHG
+    STSLICER
+    OVER
+    SREFS
+    0 GTINT
+    IF:<{
+      SWAP
+      LDREF
+      DROP
+      CTOS
+      str2bin CALLDICT
+      STSLICER
+    }>ELSE<{
+      NIP
+    }>
+    ENDC
+    CTOS
+    32 LDU
+  }>
+  clone_slice PROC:<{
+    NEWC
+    SWAP
+    STSLICER
+    ENDC
+    CTOS
+  }>
+  pack_addr PROC:<{
+    NEWC
+    s1 s2 XCHG
+    8 STI
+    SWAP
+    STSLICER
+    ENDC
+    CTOS
+  }>
+  load_data PROC:<{
+    CTOS
+    8 LDU
+    SWAP
+    3 LSHIFT#
+    LDSLICEX
+    8 LDU
+    SWAP
+    3 LSHIFT#
+    LDSLICEX
+    8 LDU
+    LDGRAMS
+    LDDICT
+    LDDICT
+    ENDS
+  }>
+  store_data PROC:<{
+    s4 PUSH
+    SBITS
+    3 RSHIFT#
+    s6 PUSH
+    SBITS
+    3 RSHIFT#
+    NEWC
+    8 STU
+    s0 s7 XCHG2
+    STSLICER
+    s1 s6 XCHG
+    8 STU
+    s0 s4 XCHG2
+    STSLICER
+    s1 s2 XCHG
+    8 STU
+    SWAP
+    STGRAMS
+    STDICT
+    STDICT
+    ENDC
+    c4 POP
+  }>
+  _get_balance PROC:<{
+    SWAP
+    264 PUSHINT
+    DICTGET
+    NULLSWAPIFNOT
+    IFJMP:<{
+      LDGRAMS
+      DROP
+    }>
+    DROP
+    0 PUSHINT
+  }>
+  ~set_balance PROC:<{
+    NEWC
+    SWAP
+    STGRAMS
+    s0 s2 XCHG
+    264 PUSHINT
+    DICTSETB
+  }>
+  _get_allowance PROC:<{
+    s0 s2 XCHG
+    264 PUSHINT
+    DICTGET
+    NULLSWAPIFNOT
+    IFJMP:<{
+      LDDICT
+      DROP
+      264 PUSHINT
+      DICTGET
+      NULLSWAPIFNOT
+      IFJMP:<{
+        LDGRAMS
+        DROP
+      }>
+      DROP
+      0 PUSHINT
+    }>
+    2DROP
+    0 PUSHINT
+  }>
+  ~set_allowance PROC:<{
+    s2 s3 PUSH2
+    264 PUSHINT
+    DICTGET
+    NULLSWAPIFNOT
+    IF:<{
+      LDDICT
+      DROP
+    }>ELSE<{
+      DROP
+      NEWDICT
+    }>
+    NEWC
+    ROT
+    STGRAMS
+    -ROT
+    264 PUSHINT
+    DICTSETB
+    NEWC
+    STDICT
+    s0 s2 XCHG
+    264 PUSHINT
+    DICTSETB
+  }>
+  send_message_back PROC:<{
+    0 PUSHINT
+    24 PUSHINT
+    NEWC
+    6 STU
+    s0 s5 XCHG2
+    STSLICER
+    s4 PUSH
+    STGRAMS
+    s1 s4 XCHG
+    107 STU
+    s1 s2 XCHG
+    32 STU
+    64 STU
+    32 STU
+    ENDC
+    64 PUSHINT
+    SENDRAWMSG
+  }>
+  recv_internal PROC:<{
+    s2 POP
+    CTOS
+    4 LDU
+    SWAP
+    1 PUSHINT
+    AND
+    IFJMP:<{
+      2DROP
+    }>
+    LDMSGADDR
+    DROP
+    DUP
+    REWRITEVARADDR
+    pack_addr CALLDICT
+    s0 s2 XCHG
+    32 LDU
+    OVER
+    0 EQINT
+    OVER
+    SBITS
+    0 EQINT
+    AND
+    IFJMP:<{
+      4 BLKDROP
+    }>
+    parse_msg CALLDICT
+    64 LDU
+    s2 PUSH
+    3 GTINT
+    IFJMP:<{
+      DROP
+      s3 POP
+      DUP
+      31 PUSHPOW2
+      LESS
+      IF:<{
+        s1 s2 XCHG
+        32 PUSHPOW2DEC
+        -ROT
+        send_message_back CALLDICT
+      }>ELSE<{
+        3 BLKDROP
+      }>
+    }>
+    c4 PUSH
+    load_data CALLDICT
+    s8 PUSH
+    1 EQINT
+    IF:<{
+      s0 s6 XCHG
+      264 PUSHINT
+      LDSLICEX
+      LDGRAMS
+      DROP
+      s2 s11 PUSH2
+      _get_balance CALLDICT
+      2DUP
+      LEQ
+      100 THROWIFNOT
+      OVER
+      SUB
+      s3 s12 s0 XCHG3
+      ~set_balance CALLDICT
+      s0 s1 PUSH2
+      _get_balance CALLDICT
+      s0 s11 XCHG2
+      ADD
+      s2 s10 XCHG
+      ~set_balance CALLDICT
+    }>ELSE<{
+      s8 PUSH
+      2 EQINT
+      IF:<{
+        s0 s6 XCHG
+        264 PUSHINT
+        LDSLICEX
+        264 PUSHINT
+        LDSLICEX
+        LDGRAMS
+        DROP
+        2OVER
+        _get_balance CALLDICT
+        s9 s3 s13 PUSH3
+        _get_allowance CALLDICT
+        s2 s1 PUSH2
+        LEQ
+        100 THROWIFNOT
+        s2 s0 PUSH2
+        LEQ
+        101 THROWIFNOT
+        s1 s2 XCPU
+        SUB
+        s5 s4 s(-1) XCPUXC
+        ~set_balance CALLDICT
+        s0 s2 PUSH2
+        _get_balance CALLDICT
+        s2 PUSH
+        ADD
+        s1 s3 s0 XCHG3
+        ~set_balance CALLDICT
+        s3 s3 XCHG2
+        SUB
+        s3 s7 XCHG
+        s1 s11 s0 XCHG3
+        ~set_allowance CALLDICT
+      }>ELSE<{
+        s8 PUSH
+        3 EQINT
+        IF:<{
+          s0 s6 XCHG
+          264 PUSHINT
+          LDSLICEX
+          LDGRAMS
+          DROP
+          s3 s7 XCHG
+          s2 s11 XCHG
+          ~set_allowance CALLDICT
+        }>ELSE<{
+          s0 s10 s6 XCHG3
+          2DROP
+        }>
+      }>
+      s4 s8 XCHG
+      s0 s4 XCHG
+    }>
+    s3 s5 XCHG
+    s4 s3 s0 XCHG3
+    s8 s0 s8 XCHG3
+    store_data CALLDICT
+    s1 s2 XCHG
+    31 PUSHPOW2
+    -ROT
+    send_message_back CALLDICT
+  }>
+  recv_external PROC:<{
+    264 PUSHINT
+    LDSLICEX
+    DROP
+    c4 PUSH
+    load_data CALLDICT
+    s1 s6 PUSH2
+    _get_balance CALLDICT
+    0 EQINT
+    60 THROWIFNOT
+    ACCEPT
+    s6 s2 XCPU
+    ~set_balance CALLDICT
+    5 ROLL
+    store_data CALLDICT
+  }>
+  get_name PROC:<{
+    c4 PUSH
+    load_data CALLDICT
+    5 BLKDROP
+    clone_slice CALLDICT
+  }>
+  get_symbol PROC:<{
+    c4 PUSH
+    load_data CALLDICT
+    s4 s5 XCHG
+    5 BLKDROP
+    clone_slice CALLDICT
+  }>
+  get_decimals PROC:<{
+    c4 PUSH
+    load_data CALLDICT
+    s3 s5 XCHG
+    5 BLKDROP
+  }>
+  get_total_supply PROC:<{
+    c4 PUSH
+    load_data CALLDICT
+    s2 s5 XCHG
+    5 BLKDROP
+  }>
+  balance_of PROC:<{
+    c4 PUSH
+    load_data CALLDICT
+    s1 s5 XCHG
+    5 BLKDROP
+    SWAP
+    _get_balance CALLDICT
+  }>
+  allowance PROC:<{
+    c4 PUSH
+    load_data CALLDICT
+    s0 s5 XCHG
+    5 BLKDROP
+    -ROT
+    _get_allowance CALLDICT
+  }>
+  ibalance_of PROC:<{
+    NEWC
+    s1 s2 XCHG
+    8 STI
+    256 STU
+    ENDC
+    CTOS
+    balance_of CALLDICT
+  }>
+  iallowance PROC:<{
+    NEWC
+    s1 s4 XCHG
+    8 STI
+    s1 s2 XCHG
+    256 STU
+    ENDC
+    CTOS
+    NEWC
+    s1 s2 XCHG
+    8 STI
+    s1 s2 XCHG
+    256 STU
+    ENDC
+    CTOS
+    allowance CALLDICT
+  }>
+  test_recv_external PROC:<{
+    recv_external CALLDICT
+    0 PUSHINT
+  }>
+  test_recv_internal PROC:<{
+    recv_internal CALLDICT
+    0 PUSHINT
+  }>
+}END>c
