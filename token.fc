@@ -168,7 +168,7 @@ int _get_allowance(cell allowed, slice owner, slice spender) {
 
   (slice name, slice symbol, int decimals, int total_supply, cell balances, cell allowed) = load_data(get_data());
 
-  throw_unless(60, _get_balance(balances, address) == 0);
+  throw_unless(60, balances.dict_empty?());
 
   accept_message();
 

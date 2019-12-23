@@ -518,9 +518,8 @@ PROGRAM{
     DROP
     c4 PUSH
     load_data CALLDICT
-    s1 s6 PUSH2
-    _get_balance CALLDICT
-    0 EQINT
+    OVER
+    DICTEMPTY
     60 THROWIFNOT
     ACCEPT
     s6 s2 XCPU
