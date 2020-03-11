@@ -10,19 +10,19 @@ slice pack_addr(int wc, slice addr) {
   return begin_cell().store_int(wc, 8).store_slice(addr).end_cell().begin_parse();
 }
 
-(slice, slice, int, int, cell, cell) load_data(cell data) {
+(slice, slice, int, int, cell, cell, int) load_data(cell data) {
   slice ds = data.begin_parse();
   int name_size = ds~load_uint(8);
   slice name = ds~load_bits(name_size * 8);
   int symbol_size = ds~load_uint(8);
   slice symbol = ds~load_bits(symbol_size * 8);
-  var result = (name, symbol, ds~load_uint(8), ds~load_grams(), ds~load_dict(), ds~load_dict());
+  var result = (name, symbol, ds~load_uint(8), ds~load_grams(), ds~load_dict(), ds~load_dict(), ds~load_uint(1));
   ds.end_parse();
   return result;
 }
 
-() store_data(slice name, slice symbol, int decimals, int total_supply, cell balances, cell allowed) impure {
- set_data(begin_cell()
+() store_data(slice name, slice symbol, int decimals, int total_supply, cell balances, cell allowed, int initialized) impure {
+  set_data(begin_cell()
     .store_uint(name.slice_bits() / 8, 8)
     .store_slice(name)
     .store_uint(symbol.slice_bits() / 8, 8)
@@ -31,6 +31,7 @@ slice pack_addr(int wc, slice addr) {
     .store_grams(total_supply)
     .store_dict(balances)
     .store_dict(allowed)
+    .store_uint(initialized, 1)
     .end_cell()
   );
 }
@@ -118,7 +119,7 @@ int _get_allowance(cell allowed, slice owner, slice spender) {
     return ();
   }
 
-  (slice name, slice symbol, int decimals, int total_supply, cell balances, cell allowed) = load_data(get_data());
+  (slice name, slice symbol, int decimals, int total_supply, cell balances, cell allowed, int initialized) = load_data(get_data());
 
   if (action == 1) { ;; transfer
 
@@ -157,57 +158,50 @@ int _get_allowance(cell allowed, slice owner, slice spender) {
 
   }
 
-  store_data(name, symbol, decimals, total_supply, balances, allowed);
+  store_data(name, symbol, decimals, total_supply, balances, allowed, initialized);
 
   ;; send ok response and return unused grams
   send_message_back(sender_raw, 0x80000000, query_id, action);
 }
 
 () recv_external(slice in_msg) impure {
-  slice address = in_msg~load_bits(264);
-
-  (slice name, slice symbol, int decimals, int total_supply, cell balances, cell allowed) = load_data(get_data());
-
-  throw_unless(60, balances.dict_empty?());
-
+  (slice name, slice symbol, int decimals, int total_supply, cell balances, cell allowed, int initialized) = load_data(get_data());
+  throw_unless(60, initialized == 0);
   accept_message();
-
-  balances~set_balance(address, total_supply);
-
-  store_data(name, symbol, decimals, total_supply, balances, allowed);
+  store_data(name, symbol, decimals, total_supply, balances, allowed, 1);
 }
 
 ;; Returns the name of the token.
 slice get_name() method_id {
-  (slice name, slice symbol, int decimals, int total_supply, cell balances, cell allowed) = load_data(get_data());
+  (slice name, slice symbol, int decimals, int total_supply, cell balances, cell allowed, _) = load_data(get_data());
 
   return clone_slice(name);
 }
 
 ;; Returns the symbol of the token.
 slice get_symbol() method_id {
-  (slice name, slice symbol, int decimals, int total_supply, cell balances, cell allowed) = load_data(get_data());
+  (slice name, slice symbol, int decimals, int total_supply, cell balances, cell allowed, _) = load_data(get_data());
 
   return clone_slice(symbol);
 }
 
 ;; Returns the number of decimals the token uses.
 int get_decimals() method_id {
-  (slice name, slice symbol, int decimals, int total_supply, cell balances, cell allowed) = load_data(get_data());
+  (slice name, slice symbol, int decimals, int total_supply, cell balances, cell allowed, _) = load_data(get_data());
 
   return decimals;
 }
 
 ;; Returns the total token supply.
 int get_total_supply() method_id {
-  (slice name, slice symbol, int decimals, int total_supply, cell balances, cell allowed) = load_data(get_data());
+  (slice name, slice symbol, int decimals, int total_supply, cell balances, cell allowed, _) = load_data(get_data());
 
   return total_supply;
 }
 
 ;; Returns the account balance of another account with address _owner.
 int balance_of(slice owner) method_id {
-  (slice name, slice symbol, int decimals, int total_supply, cell balances, cell allowed) = load_data(get_data());
+  (slice name, slice symbol, int decimals, int total_supply, cell balances, cell allowed, _) = load_data(get_data());
 
   return _get_balance(balances, owner);
 }
@@ -216,7 +210,7 @@ int balance_of(slice owner) method_id {
 ;; @param _owner The address of the account owning tokens.
 ;; @param _spender The address of the account able to transfer the tokens.
 int allowance(slice owner, slice spender) method_id {
-  (slice name, slice symbol, int decimals, int total_supply, cell balances, cell allowed) = load_data(get_data());
+  (slice name, slice symbol, int decimals, int total_supply, cell balances, cell allowed, _) = load_data(get_data());
 
   return _get_allowance(allowed, owner, spender);
 }

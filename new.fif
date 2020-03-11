@@ -18,7 +18,7 @@ owner_addr_file load-address 2dup 2constant owner_addr
 
 "token.fif" include =: code
 
-null =: balances
+<b total_supply Gram, b> <s <b owner_addr addr, b> <s dictnew 264 sdict! drop =: balances
 
 null =: allowed
 
@@ -30,6 +30,7 @@ null =: allowed
    total_supply Gram,
    balances dict,
    allowed dict,
+   0 1 u,
 b> =: data
 
 null =: libs
@@ -44,7 +45,7 @@ name type ." address = " 2dup .addr cr
 ."Non-bounceable address (for init): " 2dup 7 .Addr cr
 ."Bounceable address (for later access): " 6 .Addr cr
 
-<b owner_addr addr, b> =: init_msg
+<b  b> =: init_msg
 
 <b b{1000100} s, contract_addr addr, b{000010} s, state_init <s s, b{0} s, init_msg <s s, b> =: external_msg
 external_msg 2 boc+>B

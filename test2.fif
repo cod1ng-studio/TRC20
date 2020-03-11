@@ -1,0 +1,113 @@
+#!/usr/bin/env fift -s
+"TonUtil.fif" include
+"Asm.fif" include
+
+"owner.addr" load-address 2dup 2constant owner_addr
+
+variable storage
+variable exit_code
+
+{ storage ! exit_code ! } : finish_run
+{ exit_code @ 0 = not abort"command failed" } : exit_grace
+
+{
+  ."Exit code " exit_code @ . cr
+  ."Updated storage: " cr storage @ <s csr. cr
+  ."Stack:" cr .s
+} : print_result
+
+"token.fif" include =: code
+
+100000000000000000000000000 =: total_supply
+
+<b total_supply Gram, b> <s <b owner_addr addr, b> <s dictnew 264 sdict! drop =: balances
+dictnew =: allowed
+
+// init storage
+<b "RUB" $len 8 u,
+   "RUB" $,
+   "R" $len 8 u,
+   "R" $,
+   18 8 u,
+   total_supply Gram,
+   balances dict,
+   allowed dict,
+   0 1 u,
+b> storage !
+
+// receive external - init
+
+ <b b> <s
+
+ 124838 code <s storage @ runvm
+ finish_run print_result exit_grace
+
+// action = 0 - just accept grams
+
+ 0
+
+ <b 0 1 i, b{000100} s, owner_addr addr, 3 Gram, b>
+
+ <b 0 32 u, b> <s
+
+ 90191 code <s storage @ runvm
+ finish_run print_result exit_grace
+
+// action = 1 - transfer
+
+ 0
+
+ <b 0 1 i, b{000100} s, owner_addr addr, 3 Gram, b>
+
+ <b 1 32 u, 0 64 u, owner_addr addr, 1 Gram,  b> <s
+
+ 90191 code <s storage @ runvm
+ finish_run print_result exit_grace
+
+// action = 3 - approve
+
+ 0
+
+ <b  0 1 i, b{000100} s, owner_addr addr, 3 Gram, b>
+
+ <b 3 32 u, 0 64 u, owner_addr addr, 3000000000000 Gram,  b> <s
+
+ 90191 code <s storage @ runvm
+ finish_run print_result exit_grace
+
+ // action = 3 - approve 2
+
+  0
+
+  <b  0 1 i, b{000100} s, owner_addr addr, 3 Gram, b>
+
+  <b 3 32 u, 0 64 u, owner_addr addr, 4000000000000 Gram,  b> <s
+
+  90191 code <s storage @ runvm
+  finish_run print_result exit_grace
+
+// action = 2 - transfer from
+
+ 0
+
+ <b  0 1 i, b{000100} s, owner_addr addr, 3 Gram, b>
+
+ <b owner_addr addr, owner_addr addr, 2 Gram, b> =: REF
+
+ <b 2 32 u, 0 64 u, REF ref, b> <s
+
+ 90191 code <s storage @ runvm
+ finish_run print_result exit_grace
+
+ // action = 2 - transfer from hex
+
+ 0
+
+ <b  0 1 i, b{000100} s, owner_addr addr, 3 Gram, b>
+
+ <b "F553F6A10CFBCE36F300B2BFAC4461DDF2B0D7BD78316F906085A749DC1B0FE3D6F553F6A10CFBCE36F3477359400" $>s s, b> =: REF
+
+ <b 0 32 u, "00000002000000000000000000B2BFAC4461DDF2B0D7BD78316F906085A749DC1B0FE3D6" $>s s, REF ref, b> <s
+
+ 90191 code <s storage @ runvm
+ finish_run print_result exit_grace

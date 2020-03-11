@@ -1,4 +1,4 @@
-// automatically generated from `/Users/tolyayanot/lite-client/crypto/smartcont/stdlib.fc` `msg_hex_comment.fc` `TRC20/token.fc` 
+// automatically generated from `/Users/tolyayanot/lite-client/crypto/smartcont/stdlib.fc` `msg_hex_comment.fc` `token.fc` 
 PROGRAM{
   85643 DECLMETHOD str2bin
   DECLPROC parse_msg
@@ -38,121 +38,121 @@ PROGRAM{
       OVER
       48 EQINT
       IF:<{
-        NIP
         0 PUSHINT
-        s0 s3 XCHG2
+        s2 POP
+        s0 s3 XCHG
         4 STU
       }>ELSE<{
         OVER
         49 EQINT
         IF:<{
-          NIP
           1 PUSHINT
-          s0 s3 XCHG2
+          s2 POP
+          s0 s3 XCHG
           4 STU
         }>ELSE<{
           OVER
           50 EQINT
           IF:<{
-            NIP
             2 PUSHINT
-            s0 s3 XCHG2
+            s2 POP
+            s0 s3 XCHG
             4 STU
           }>ELSE<{
             OVER
             51 EQINT
             IF:<{
-              NIP
               3 PUSHINT
-              s0 s3 XCHG2
+              s2 POP
+              s0 s3 XCHG
               4 STU
             }>ELSE<{
               OVER
               52 EQINT
               IF:<{
-                NIP
                 4 PUSHINT
-                s0 s3 XCHG2
+                s2 POP
+                s0 s3 XCHG
                 4 STU
               }>ELSE<{
                 OVER
                 53 EQINT
                 IF:<{
-                  NIP
                   5 PUSHINT
-                  s0 s3 XCHG2
+                  s2 POP
+                  s0 s3 XCHG
                   4 STU
                 }>ELSE<{
                   OVER
                   54 EQINT
                   IF:<{
-                    NIP
                     6 PUSHINT
-                    s0 s3 XCHG2
+                    s2 POP
+                    s0 s3 XCHG
                     4 STU
                   }>ELSE<{
                     OVER
                     55 EQINT
                     IF:<{
-                      NIP
                       7 PUSHINT
-                      s0 s3 XCHG2
+                      s2 POP
+                      s0 s3 XCHG
                       4 STU
                     }>ELSE<{
                       OVER
                       56 EQINT
                       IF:<{
-                        NIP
                         8 PUSHINT
-                        s0 s3 XCHG2
+                        s2 POP
+                        s0 s3 XCHG
                         4 STU
                       }>ELSE<{
                         OVER
                         57 EQINT
                         IF:<{
-                          NIP
                           9 PUSHINT
-                          s0 s3 XCHG2
+                          s2 POP
+                          s0 s3 XCHG
                           4 STU
                         }>ELSE<{
                           OVER
                           65 EQINT
                           IF:<{
-                            NIP
                             10 PUSHINT
-                            s0 s3 XCHG2
+                            s2 POP
+                            s0 s3 XCHG
                             4 STU
                           }>ELSE<{
                             OVER
                             66 EQINT
                             IF:<{
-                              NIP
                               11 PUSHINT
-                              s0 s3 XCHG2
+                              s2 POP
+                              s0 s3 XCHG
                               4 STU
                             }>ELSE<{
                               OVER
                               67 EQINT
                               IF:<{
-                                NIP
                                 12 PUSHINT
-                                s0 s3 XCHG2
+                                s2 POP
+                                s0 s3 XCHG
                                 4 STU
                               }>ELSE<{
                                 OVER
                                 68 EQINT
                                 IF:<{
-                                  NIP
                                   13 PUSHINT
-                                  s0 s3 XCHG2
+                                  s2 POP
+                                  s0 s3 XCHG
                                   4 STU
                                 }>ELSE<{
                                   OVER
                                   69 EQINT
                                   IF:<{
-                                    NIP
                                     14 PUSHINT
-                                    s0 s3 XCHG2
+                                    s2 POP
+                                    s0 s3 XCHG
                                     4 STU
                                   }>ELSE<{
                                     SWAP
@@ -161,9 +161,9 @@ PROGRAM{
                                       15 PUSHINT
                                       s0 s3 XCHG2
                                       4 STU
-                                    }>ELSE<{
                                       s0 s2 XCHG
                                     }>
+                                    s0 s2 XCHG
                                   }>
                                 }>
                               }>
@@ -245,8 +245,8 @@ PROGRAM{
     CTOS
   }>
   pack_addr PROC:<{
+    SWAP
     NEWC
-    s1 s2 XCHG
     8 STI
     SWAP
     STSLICER
@@ -267,29 +267,31 @@ PROGRAM{
     LDGRAMS
     LDDICT
     LDDICT
+    1 LDU
     ENDS
   }>
   store_data PROC:<{
-    s4 PUSH
+    s5 PUSH
     SBITS
     3 RSHIFT#
-    s6 PUSH
+    s7 PUSH
     SBITS
     3 RSHIFT#
     NEWC
     8 STU
-    s0 s7 XCHG2
+    s0 s8 XCHG2
     STSLICER
-    s1 s6 XCHG
+    s1 s7 XCHG
     8 STU
-    s0 s4 XCHG2
+    s0 s5 XCHG2
     STSLICER
-    s1 s2 XCHG
+    s1 s3 XCHG
     8 STU
     SWAP
     STGRAMS
     STDICT
     STDICT
+    1 STU
     ENDC
     c4 POP
   }>
@@ -424,43 +426,43 @@ PROGRAM{
     }>
     c4 PUSH
     load_data CALLDICT
-    s8 PUSH
+    s9 PUSH
     1 EQINT
     IF:<{
-      s0 s6 XCHG
+      s0 s7 XCHG
       264 PUSHINT
       LDSLICEX
       LDGRAMS
       DROP
-      s2 s11 PUSH2
+      s3 s12 PUSH2
       _get_balance CALLDICT
       2DUP
       LEQ
       100 THROWIFNOT
       OVER
       SUB
-      s3 s12 s0 XCHG3
+      s4 s13 s0 XCHG3
       ~set_balance CALLDICT
-      s0 s1 PUSH2
+      s0 s2 PUSH2
       _get_balance CALLDICT
-      s0 s11 XCHG2
+      s0 s12 XCHG2
       ADD
-      s2 s10 XCHG
+      s11 s11 s0 XCHG3
       ~set_balance CALLDICT
     }>ELSE<{
-      s8 PUSH
+      s9 PUSH
       2 EQINT
       IF:<{
-        s0 s6 XCHG
+        s0 s7 XCHG
         264 PUSHINT
         LDSLICEX
         264 PUSHINT
         LDSLICEX
         LDGRAMS
         DROP
-        2OVER
+        s4 s2 PUSH2
         _get_balance CALLDICT
-        s9 s3 s13 PUSH3
+        s4 s3 s14 PUSH3
         _get_allowance CALLDICT
         s2 s1 PUSH2
         LEQ
@@ -470,7 +472,7 @@ PROGRAM{
         101 THROWIFNOT
         s1 s2 XCPU
         SUB
-        s5 s4 s(-1) XCPUXC
+        s6 s4 s(-1) XCPUXC
         ~set_balance CALLDICT
         s0 s2 PUSH2
         _get_balance CALLDICT
@@ -478,34 +480,37 @@ PROGRAM{
         ADD
         s1 s3 s0 XCHG3
         ~set_balance CALLDICT
-        s3 s3 XCHG2
+        s4 s4 XCHG2
         SUB
-        s3 s7 XCHG
-        s1 s11 s0 XCHG3
+        s1 s3 s0 XCHG3
+        s1 s12 XCHG
         ~set_allowance CALLDICT
       }>ELSE<{
-        s8 PUSH
+        s9 PUSH
         3 EQINT
         IF:<{
-          s0 s6 XCHG
+          s0 s7 XCHG
           264 PUSHINT
           LDSLICEX
           LDGRAMS
           DROP
-          s3 s7 XCHG
-          s2 s11 XCHG
+          s2 s3 XCHG
+          s2 s12 XCHG
           ~set_allowance CALLDICT
+          s0 s9 XCHG
         }>ELSE<{
-          s0 s10 s6 XCHG3
-          2DROP
+          s7 POP
+          s10 POP
         }>
+        s0 s9 XCHG
       }>
-      s4 s8 XCHG
-      s0 s4 XCHG
+      s0 s9 XCHG
     }>
+    s4 s6 XCHG
     s3 s5 XCHG
-    s4 s3 s0 XCHG3
-    s8 s0 s8 XCHG3
+    s0 s1 s4 XCHG3
+    s9 s9 XCHG2
+    s0 s3 XCHG
     store_data CALLDICT
     s1 s2 XCHG
     31 PUSHPOW2
@@ -513,64 +518,59 @@ PROGRAM{
     send_message_back CALLDICT
   }>
   recv_external PROC:<{
-    264 PUSHINT
-    LDSLICEX
     DROP
     c4 PUSH
     load_data CALLDICT
-    OVER
-    DICTEMPTY
+    0 EQINT
     60 THROWIFNOT
     ACCEPT
-    s6 s2 XCPU
-    ~set_balance CALLDICT
-    5 ROLL
+    1 PUSHINT
     store_data CALLDICT
   }>
   get_name PROC:<{
     c4 PUSH
     load_data CALLDICT
-    5 BLKDROP
+    6 BLKDROP
     clone_slice CALLDICT
   }>
   get_symbol PROC:<{
     c4 PUSH
     load_data CALLDICT
-    s4 s5 XCHG
-    5 BLKDROP
+    s5 s6 XCHG
+    6 BLKDROP
     clone_slice CALLDICT
   }>
   get_decimals PROC:<{
     c4 PUSH
     load_data CALLDICT
-    s3 s5 XCHG
-    5 BLKDROP
+    s4 s6 XCHG
+    6 BLKDROP
   }>
   get_total_supply PROC:<{
     c4 PUSH
     load_data CALLDICT
-    s2 s5 XCHG
-    5 BLKDROP
+    s3 s6 XCHG
+    6 BLKDROP
   }>
   balance_of PROC:<{
     c4 PUSH
     load_data CALLDICT
-    s1 s5 XCHG
-    5 BLKDROP
+    s2 s6 XCHG
+    6 BLKDROP
     SWAP
     _get_balance CALLDICT
   }>
   allowance PROC:<{
     c4 PUSH
     load_data CALLDICT
-    s0 s5 XCHG
-    5 BLKDROP
+    s1 s6 XCHG
+    6 BLKDROP
     -ROT
     _get_allowance CALLDICT
   }>
   ibalance_of PROC:<{
+    SWAP
     NEWC
-    s1 s2 XCHG
     8 STI
     256 STU
     ENDC
@@ -578,15 +578,15 @@ PROGRAM{
     balance_of CALLDICT
   }>
   iallowance PROC:<{
+    s0 s3 XCHG
     NEWC
-    s1 s4 XCHG
     8 STI
     s1 s2 XCHG
     256 STU
     ENDC
     CTOS
+    SWAP
     NEWC
-    s1 s2 XCHG
     8 STI
     s1 s2 XCHG
     256 STU
