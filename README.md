@@ -110,7 +110,7 @@ Note Transfers of 0 values MUST be treated as normal transfers.
 
 Allows 'spender' to withdraw from your account multiple times, up to the 'value' amount. If this function is called again it overwrites the current allowance with 'value'.
 
-NOTE: To prevent attack vectors like the one [described here](https://docs.google.com/document/d/1YLPtQxZu1UAvO9cZ1O2RPXBbT0mooh4DYKjA_jp-RLM/), clients SHOULD make sure to create user interfaces in such a way that they set the allowance first to 0 before setting it to another value for the same spender. THOUGH The contract itself shouldn’t enforce it.
+NOTE: To prevent attack vectors like the one [described here](https://docs.google.com/document/d/1YLPtQxZu1UAvO9cZ1O2RPXBbT0mooh4DYKjA_jp-RLM/), contract REQUIRES set the allowance first to 0 before setting it to another value for the same spender.
 
 
 ### Implementation

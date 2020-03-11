@@ -500,6 +500,13 @@ PROGRAM{
           LDSLICEX
           LDGRAMS
           DROP
+          s2 s12 s1 PUSH3
+          _get_allowance CALLDICT
+          0 EQINT
+          OVER
+          0 EQINT
+          OR
+          102 THROWIFNOT
           s2 s3 XCHG
           s2 s12 XCHG
           ~set_allowance CALLDICT
