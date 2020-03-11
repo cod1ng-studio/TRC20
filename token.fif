@@ -394,6 +394,12 @@ PROGRAM{
     DUP
     REWRITEVARADDR
     pack_addr CALLDICT
+    s2 PUSH
+    SBITS
+    0 EQINT
+    IFJMP:<{
+      3 BLKDROP
+    }>
     s0 s2 XCHG
     32 LDU
     OVER
