@@ -164,6 +164,17 @@ int _get_allowance(cell allowed, slice owner, slice spender) {
 
     allowed~set_allowance(sender, spender, value);
 
+  } elseif (action == 4) { ;; increase/decrease allowance
+
+    int is_decrease = cs~load_uint(1);
+    slice spender = cs~load_bits(264);
+    int delta_value = cs~load_grams();
+    int old_allowed = _get_allowance(allowed, sender, spender);
+    int new_allowed = is_decrease ? (old_allowed - delta_value) : (old_allowed + delta_value);
+    throw_unless(103, new_allowed >= 0);
+
+    allowed~set_allowance(sender, spender, new_allowed);
+
   }
 
   store_data(name, symbol, decimals, total_supply, balances, allowed, initialized);

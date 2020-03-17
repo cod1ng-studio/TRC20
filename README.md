@@ -112,6 +112,13 @@ Allows 'spender' to withdraw from your account multiple times, up to the 'value'
 
 NOTE: To prevent attack vectors like the one [described here](https://docs.google.com/document/d/1YLPtQxZu1UAvO9cZ1O2RPXBbT0mooh4DYKjA_jp-RLM/), contract REQUIRES set the allowance first to 0 before setting it to another value for the same spender.
 
+### increase/decrease allowance
+
+`op = 4`
+
+`<b 4 32 u, query_id 64 u, is_decrease 1 u, spender_addr addr, delta_value Gram, b>`
+
+Atomically increase/decrease the allowance by 'delta_value', granted to 'spender' by the caller. This is an alternative to 'approve' method.  
 
 ### Implementation
 
@@ -146,6 +153,18 @@ approve.fif - Creates an approve message body.
 transfer_from.fif - Creates a transfer_from message body.
 
 `fift -s transfer_from.fif owner.addr spender.addr 77.7`
+
+---
+
+increase-allowance.fif - Creates an increase allowance message body.
+
+`fift -s increase-allowance.fif owner.addr spender.addr 77.7`
+
+---
+
+decrease-allowance.fif - Creates a decrease allowance message body.
+
+`fift -s decrease-allowance.fif owner.addr spender.addr 77.7`
 
 ---
 

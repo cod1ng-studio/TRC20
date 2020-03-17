@@ -510,12 +510,39 @@ PROGRAM{
           s2 s3 XCHG
           s2 s12 XCHG
           ~set_allowance CALLDICT
-          s0 s9 XCHG
         }>ELSE<{
-          s7 POP
-          s10 POP
+          s9 PUSH
+          4 EQINT
+          IF:<{
+            s0 s7 XCHG
+            1 LDU
+            264 PUSHINT
+            LDSLICEX
+            LDGRAMS
+            DROP
+            s3 s13 s1 PUSH3
+            _get_allowance CALLDICT
+            s0 s3 XCHG
+            IF:<{
+              s1 s2 XCHG
+              SUB
+            }>ELSE<{
+              s1 s2 XCHG
+              ADD
+            }>
+            DUP
+            -1 GTINT
+            103 THROWIFNOT
+            s2 s3 XCHG
+            s2 s12 XCHG
+            ~set_allowance CALLDICT
+            s0 s9 XCHG
+          }>ELSE<{
+            s7 POP
+            s10 POP
+          }>
+          s0 s9 XCHG
         }>
-        s0 s9 XCHG
       }>
       s0 s9 XCHG
     }>
