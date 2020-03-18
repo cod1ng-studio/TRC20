@@ -1,0 +1,69 @@
+#!/usr/bin/env fift -s
+"TonUtil.fif" include
+"Asm.fif" include
+
+"owner.addr" load-address 2dup 2constant owner_addr
+
+variable storage
+variable exit_code
+
+{ storage ! exit_code ! } : finish_run
+{ exit_code @ 0 = not abort"command failed" } : exit_grace
+
+{
+  ."Exit code " exit_code @ . cr
+  ."Updated storage: " cr storage @ <s csr. cr
+  ."Stack:" cr .s
+} : print_result
+
+"token.fif" include =: code
+
+100000000000000000000000000 =: total_supply
+
+<b total_supply Gram, b> <s <b owner_addr addr, b> <s dictnew 264 sdict! drop =: balances
+dictnew =: allowed
+
+// init storage
+<b "RUB" $len 8 u,
+   "RUB" $,
+   "R" $len 8 u,
+   "R" $,
+   18 8 u,
+   total_supply Gram,
+   balances dict,
+   allowed dict,
+   0 1 u,
+b> storage !
+
+// receive external - init
+
+ <b b> <s
+
+ 124838 code <s storage @ runvm
+ finish_run print_result exit_grace
+
+// action = 2 - transfer bounced
+
+ 0
+
+ <b  0 1 i, b{001100} s, owner_addr addr, 3 Gram, b>
+
+ <b 0x20000000 32 u, 0 64 u, 1 32 u, owner_addr addr, owner_addr addr, 2 Gram,  b> <s
+
+ 90191 code <s storage @ runvm
+ finish_run print_result exit_grace
+
+// balance_of owner
+
+  <b owner_addr addr, b> <s
+
+  112966 code <s storage @ runvm
+  finish_run print_result exit_grace
+
+  // allowance owner
+
+  <b owner_addr addr, b> <s
+  <b owner_addr addr, b> <s
+
+  82759 code <s storage @ runvm
+  finish_run print_result exit_grace

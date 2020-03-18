@@ -75,13 +75,24 @@ b> storage !
  90191 code <s storage @ runvm
  finish_run print_result exit_grace
 
- // action = 3 - approve 2
+ // action = 3 - increase approve
 
   0
 
   <b  0 1 i, b{000100} s, owner_addr addr, 3 Gram, b>
 
-  <b 3 32 u, 0 64 u, owner_addr addr, 4000000000000 Gram,  b> <s
+  <b 4 32 u, 0 64 u, 0 1 u, owner_addr addr, 1000000000000 Gram,  b> <s
+
+  90191 code <s storage @ runvm
+  finish_run print_result exit_grace
+
+  // action = 3 - decrease approve
+
+  0
+
+  <b  0 1 i, b{000100} s, owner_addr addr, 3 Gram, b>
+
+  <b 4 32 u, 0 64 u, 1 1 u, owner_addr addr, 500000000000 Gram,  b> <s
 
   90191 code <s storage @ runvm
   finish_run print_result exit_grace
@@ -111,3 +122,19 @@ b> storage !
 
  90191 code <s storage @ runvm
  finish_run print_result exit_grace
+
+
+// balance_of owner
+
+  <b owner_addr addr, b> <s
+
+  112966 code <s storage @ runvm
+  finish_run print_result exit_grace
+
+  // allowance owner
+
+  <b owner_addr addr, b> <s
+  <b owner_addr addr, b> <s
+
+  82759 code <s storage @ runvm
+  finish_run print_result exit_grace
