@@ -94,7 +94,7 @@ int _get_allowance(cell allowed, slice owner, slice spender) {
 
 ;; to_addr - 264bit address
 ;; address - 264bit address
-() send_message(slice to_addr, int action, int query_id, int query_action, slice address, int value, slice payload) impure {
+() send_message(slice to_addr, int action, int query_id, slice address, int value, slice payload) impure {
   ;; int_msg_info ihr_disabled:1 bounce:1 bounced:0 src:MsgAddress -> 011000
   var msg = begin_cell()
       .store_uint(0x18, 6)
@@ -115,7 +115,7 @@ int _get_allowance(cell allowed, slice owner, slice spender) {
     );
   }
 
-  send_raw_message(msg.end_cell(), 1); ;; pay fees separately
+  send_raw_message(msg.end_cell(), 64); ;; carry all the remaining value of the inbound message
 }
 
 ;; value - MUST BE NON-NEGATIVE
@@ -141,25 +141,15 @@ int _get_allowance(cell allowed, slice owner, slice spender) {
   return (allowed, new_allowed);
 }
 
-() process_rollback(slice sender, int main_action,  slice cs) impure {
-  if (main_action != 0x20000000) {
-    return ();
-  }
-
-  int action = cs~load_uint(32);
-
-  if ((action != 1) & (action != 2)) {
-    return ();
-  }
-
+() process_rollback(slice sender, int action,  slice cs) impure {
   slice rollback_address = cs~load_bits(264);
   int rollback_value = cs~load_grams();
 
   (slice name, slice symbol, int decimals, int total_supply, cell balances, cell allowed, int initialized) = load_data(get_data());
 
-  if (action == 1) { ;; transfer
+  if (action == 0x20000001) { ;; transfer
     balances~transfer(sender, rollback_address, rollback_value);
-  } elseif (action == 2) { ;; transfer from
+  } elseif (action == 0x20000002) { ;; transfer from
     allowed~increase_allowance(sender, rollback_address, rollback_value);
   }
 
@@ -204,7 +194,7 @@ int _get_allowance(cell allowed, slice owner, slice spender) {
 
   if (action > 4) {
     if (action < 0x80000000) { ;; not response
-      send_message_back(sender_raw, 0xffffffff, query_id, action); ;; operation not supported todo: а на это откатывать
+      send_message_back(sender_raw, 0xffffffff, query_id, action); ;; operation not supported
     }
     return ();
   }
@@ -222,7 +212,7 @@ int _get_allowance(cell allowed, slice owner, slice spender) {
 
     balances~transfer(sender, to, value);
 
-    event_action = 0x20000000;
+    event_action = 0x20000001;
 
   } elseif (action == 2) { ;; transfer_from
 
@@ -233,9 +223,7 @@ int _get_allowance(cell allowed, slice owner, slice spender) {
     allowed~increase_allowance(from, sender, - value);
     balances~transfer(from, to, value);
 
-    if (to.slice_hash() != sender.slice_hash()) {
-      event_action = 0x20000000;
-    }
+    event_action = 0x20000002;
 
   } elseif (action == 3) { ;; approve
 
@@ -249,7 +237,7 @@ int _get_allowance(cell allowed, slice owner, slice spender) {
 
     allowed~set_allowance(sender, spender, value);
 
-    event_action = 0x20000001;
+    event_action = 0x20000003;
 
   } elseif (action == 4) { ;; increase/decrease allowance
 
@@ -259,18 +247,14 @@ int _get_allowance(cell allowed, slice owner, slice spender) {
     int delta_value = cs~load_grams();
 
     value = allowed~increase_allowance(sender, spender, is_decrease ? - delta_value : delta_value);
-    event_action = 0x20000001;
+
+    event_action = 0x20000004;
 
   }
 
   store_data(name, symbol, decimals, total_supply, balances, allowed, initialized);
 
-  if (event_action > 0) {
-    send_message(to, event_action, query_id, action, sender, value, cs);
-  }
-
-  ;; send ok response and return unused grams
-  send_message_back(sender_raw, 0x80000000, query_id, action);
+  send_message(to, event_action, query_id, sender, value, cs);
 }
 
 () recv_external(slice in_msg) impure {
