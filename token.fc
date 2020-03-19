@@ -94,7 +94,7 @@ int _get_allowance(cell allowed, slice owner, slice spender) {
 
 ;; to_addr - 264bit address
 ;; address - 264bit address
-() send_message(slice to_addr, int action, int query_id, int query_action, slice address, int value) impure {
+() send_message(slice to_addr, int action, int query_id, int query_action, slice address, int value, slice payload) impure {
   ;; int_msg_info ihr_disabled:1 bounce:1 bounced:0 src:MsgAddress -> 011000
   var msg = begin_cell()
       .store_uint(0x18, 6)
@@ -104,9 +104,16 @@ int _get_allowance(cell allowed, slice owner, slice spender) {
       .store_uint(0, 1 + 4 + 4 + 64 + 32 + 1 + 1)
       .store_uint(action, 32)
       .store_uint(query_id, 64)
-      .store_grams(query_action)
       .store_slice(address)
       .store_grams(value);
+
+  if (payload.slice_bits() > 0) {
+    msg = msg.store_ref(
+      begin_cell()
+        .store_slice(payload~load_bits(payload.slice_bits()))
+        .end_cell()
+    );
+  }
 
   send_raw_message(msg.end_cell(), 1); ;; pay fees separately
 }
@@ -202,13 +209,11 @@ int _get_allowance(cell allowed, slice owner, slice spender) {
     return ();
   }
 
-  raw_reserve(msg_value, 3);
-
   (slice name, slice symbol, int decimals, int total_supply, cell balances, cell allowed, int initialized) = load_data(get_data());
 
   slice to = null();
   int value = 0;
-  int need_send_event = 1;
+  int event_action = 0;
 
   if (action == 1) { ;; transfer
 
@@ -216,6 +221,8 @@ int _get_allowance(cell allowed, slice owner, slice spender) {
     value = cs~load_grams();
 
     balances~transfer(sender, to, value);
+
+    event_action = 0x20000000;
 
   } elseif (action == 2) { ;; transfer_from
 
@@ -225,7 +232,10 @@ int _get_allowance(cell allowed, slice owner, slice spender) {
 
     allowed~increase_allowance(from, sender, - value);
     balances~transfer(from, to, value);
-    need_send_event = (to.slice_hash() != sender.slice_hash());
+
+    if (to.slice_hash() != sender.slice_hash()) {
+      event_action = 0x20000000;
+    }
 
   } elseif (action == 3) { ;; approve
 
@@ -239,6 +249,8 @@ int _get_allowance(cell allowed, slice owner, slice spender) {
 
     allowed~set_allowance(sender, spender, value);
 
+    event_action = 0x20000001;
+
   } elseif (action == 4) { ;; increase/decrease allowance
 
     int is_decrease = cs~load_uint(1);
@@ -247,13 +259,14 @@ int _get_allowance(cell allowed, slice owner, slice spender) {
     int delta_value = cs~load_grams();
 
     value = allowed~increase_allowance(sender, spender, is_decrease ? - delta_value : delta_value);
+    event_action = 0x20000001;
 
   }
 
   store_data(name, symbol, decimals, total_supply, balances, allowed, initialized);
 
-  if (need_send_event) {
-    send_message(to, 0x20000000, query_id, action, sender, value);
+  if (event_action > 0) {
+    send_message(to, event_action, query_id, action, sender, value, cs);
   }
 
   ;; send ok response and return unused grams

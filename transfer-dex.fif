@@ -1,0 +1,20 @@
+#!/usr/bin/env fift -s
+"TonUtil.fif" include
+"Asm.fif" include
+
+{ ."usage: " @' $0 type ." <to_addr_file> <amount> <to_value> <to_currency_type> <to_currency>" cr
+  ."Creates a transfer token to dex message body" cr 1 halt
+} : usage
+$# dup 5 < swap 5 > or ' usage if
+
+$1 load-address 2dup 2constant to_addr
+$2 $>GR =: amount
+$3 $>GR =: to_value
+$4 parse-int =: to_currency_type
+to_currency_type { <b $5 load-address addr, b> } { <b $5 parse-int 32 i, b> } cond =: to_currency
+
+<b 1 32 u, 0 64 u, to_addr addr, amount Gram, to_value Gram, to_currency_type 8 u, to_currency <s s, b> =: body_boc
+body_boc <s csr.
+body_boc 2 boc+>B
+"transfer-dex.boc" tuck B>file
+."(Saved query to file " type .")" cr

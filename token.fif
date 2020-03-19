@@ -380,10 +380,11 @@ PROGRAM{
     64 STU
     32 STU
     ENDC
-    7 PUSHPOW2
+    64 PUSHINT
     SENDRAWMSG
   }>
   send_message PROC:<{
+    s3 POP
     0 PUSHINT
     4 PUSHINT
     24 PUSHINT
@@ -400,12 +401,28 @@ PROGRAM{
     32 STU
     s1 s2 XCHG
     64 STU
-    SWAP
-    STGRAMS
-    SWAP
+    ROT
     STSLICER
-    SWAP
+    ROT
     STGRAMS
+    OVER
+    SBITS
+    0 GTINT
+    IF:<{
+      NEWC
+      s2 PUSH
+      SBITS
+      s1 s3 XCHG
+      LDSLICEX
+      DROP
+      s1 s2 XCHG
+      STSLICER
+      ENDC
+      SWAP
+      STREF
+    }>ELSE<{
+      NIP
+    }>
     ENDC
     1 PUSHINT
     SENDRAWMSG
@@ -492,7 +509,7 @@ PROGRAM{
     store_data CALLDICT
   }>
   recv_internal PROC:<{
-    SWAP
+    s2 POP
     CTOS
     4 LDU
     LDMSGADDR
@@ -504,7 +521,7 @@ PROGRAM{
     SBITS
     0 EQINT
     IFJMP:<{
-      5 BLKDROP
+      4 BLKDROP
     }>
     s0 s3 XCHG
     32 LDU
@@ -512,9 +529,8 @@ PROGRAM{
     32 PUSHPOW2DEC
     EQUAL
     IFJMP:<{
-      s5 POP
+      s0 s3 XCHG
       3 BLKDROP
-      SWAP
       64 LDU
       NIP
       32 LDU
@@ -525,10 +541,9 @@ PROGRAM{
     AND
     IFJMP:<{
       NIP
-      s3 POP
+      SWAP
       64 LDU
       NIP
-      s1 s2 XCHG
       process_rollback CALLDICT
     }>
     DUP
@@ -538,7 +553,7 @@ PROGRAM{
     0 EQINT
     AND
     IFJMP:<{
-      5 BLKDROP
+      4 BLKDROP
     }>
     ROT
     parse_msg CALLDICT
@@ -548,12 +563,11 @@ PROGRAM{
     IFJMP:<{
       DROP
       s3 POP
-      s3 POP
-      s2 PUSH
+      DUP
       31 PUSHPOW2
       LESS
       IF:<{
-        s0 s2 XCHG
+        s1 s2 XCHG
         32 PUSHPOW2DEC
         -ROT
         send_message_back CALLDICT
@@ -561,127 +575,126 @@ PROGRAM{
         3 BLKDROP
       }>
     }>
-    s0 s5 XCHG
-    3 PUSHINT
-    RAWRESERVE
     c4 PUSH
     load_data CALLDICT
     PUSHNULL
     0 PUSHINT
-    1 PUSHINT
-    s11 PUSH
+    s0 s11 PUSH2
     1 EQINT
     IF:<{
-      2 1 BLKDROP2
-      s0 s12 XCHG
+      3 BLKDROP
+      s0 s7 XCHG
       264 PUSHINT
       LDSLICEX
       LDGRAMS
-      DROP
-      s4 s12 s1 XCPU2
-      s6 PUSH
+      s4 s13 s2 XCPU2
+      s3 PUSH
       ~transfer CALLDICT
+      29 PUSHPOW2
     }>ELSE<{
-      s11 PUSH
+      s12 PUSH
       2 EQINT
       IF:<{
-        3 BLKDROP
-        s0 s11 XCHG
+        2 1 BLKDROP2
+        s0 s8 XCHG
         264 PUSHINT
         LDSLICEX
         264 PUSHINT
         LDSLICEX
         LDGRAMS
-        DROP
-        DUP
+        OVER
         NEGATE
-        s4 s3 s(-1) XCPUXC
-        s14 s(-1) PUXC
+        s6 s4 s(-1) XCPUXC
+        17 s() PUSH
+        SWAP
         ~increase_allowance CALLDICT
         DROP
-        s4 s2 s4 XC2PU
-        s4 PUSH
+        s6 s3 s2 XC2PU
+        s7 PUSH
         ~transfer CALLDICT
-        s3 PUSH
+        OVER
         HASHSU
-        s12 PUSH
+        s15 PUSH
         HASHSU
         NEQ
+        IF:<{
+          29 PUSHPOW2
+          s11 POP
+        }>
       }>ELSE<{
-        s11 PUSH
+        s12 PUSH
         3 EQINT
         IF:<{
-          2 1 BLKDROP2
-          s0 s12 XCHG
+          3 BLKDROP
+          s0 s7 XCHG
           264 PUSHINT
           LDSLICEX
           s1 s(-1) PUXC
           LDGRAMS
-          DROP
-          s4 s13 s2 PUSH3
+          s4 s14 s3 PUSH3
           _get_allowance CALLDICT
           0 EQINT
-          OVER
+          s2 PUSH
           0 EQINT
           OR
           102 THROWIFNOT
-          s4 s13 s2 XCPUXC
-          s3 PUSH
+          s4 s14 s3 XCPUXC
+          s5 PUSH
           ~set_allowance CALLDICT
+          536870913 PUSHINT
         }>ELSE<{
-          s11 PUSH
+          s12 PUSH
           4 EQINT
           IF:<{
-            2 1 BLKDROP2
-            s0 s12 XCHG
+            3 BLKDROP
+            s0 s7 XCHG
             1 LDU
             264 PUSHINT
             LDSLICEX
             s1 s(-1) PUXC
             LDGRAMS
-            DROP
-            s0 s3 XCHG
+            s0 s4 XCHG
             IF:<{
-              s0 s2 XCHG
               NEGATE
             }>ELSE<{
-              s0 s2 XCHG
             }>
-            s13 PUSH
+            s14 PUSH
             s3 s5 XCHG
-            -ROT
+            s0 s5 s5 XCHG3
             ~increase_allowance CALLDICT
-            s1 s3 XCHG
-          }>ELSE<{
-            s14 POP
+            s9 s3 s0 XCHG3
+            536870913 PUSHINT
           }>
-          s0 s3 XCHG2
+          s3 s10 XCHG
+          s1 s4 XCHG
         }>
-        s0 s3 s13 XCHG3
-        s1 s4 XCHG
+        s0 s10 XCHG
+        s4 s5 XCHG
+        s0 s3 XCHG
+        s2 s4 XCHG2
       }>
-      s0 s13 XCHG
-      s3 s4 XCHG
-      s0 s3 s3 XCHG3
+      s3 s10 XCHG
+      s4 s5 XCHG
+      s4 s0 s3 XCHG3
     }>
-    s6 s8 XCHG
-    5 4 REVERSE
-    s3 s7 XCHG
-    s7 s2 XCHG2
+    s6 s9 XCHG
+    s5 s8 XCHG
+    s4 s7 XCHG
+    s3 s9 XCHG
+    s1 s7 s10 XCHG3
     store_data CALLDICT
-    s0 s6 XCHG
+    s3 PUSH
+    0 GTINT
     IF:<{
-      s2 s5 XCHG
-      29 PUSHPOW2
-      s2 s1 s2 XCPUXC
-      s7 s6 s6 PUXC2
+      s4 s5 PUSH2
+      s4 s6 XCHG
+      s9 s9 s3 XCHG3
       send_message CALLDICT
     }>ELSE<{
-      DROP
-      s3 POP
+      4 BLKDROP
       s3 POP
     }>
-    s0 s2 XCHG
+    s1 s2 XCHG
     31 PUSHPOW2
     -ROT
     send_message_back CALLDICT
