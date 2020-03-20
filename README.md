@@ -21,6 +21,24 @@ There is no mention that the extra currency is based on its own smart contract. 
 
 TON also supports the creation of new workchains. But according to the available documentation, creating your own workchain is time-consuming, in contrast to creating a new TRC20 token.
 
+### Differences from ERC20
+
+TRC20 saves the ERC20 interface. 
+
+At the same time TRC20 corrects ERC20 weaknesses:
+
+* Race-prone approve function.
+
+* The token recipient is not notified about the transfer.
+
+* You can not add additional data to the transfer.
+
+* If you send a token to a smart contract that does not support tokens, then we will lose them.
+
+* The token sending style is different from the blockchain transaction sending style
+
+TRC20 corrects all these flaws, more in the following paragraphs.
+
 ### Specification
 
 ### Get-methods:
@@ -73,9 +91,7 @@ Following the [TON smartcontracts guidelines](https://test.ton.org/smguidelines.
 
 If the query is invalid, the smart contract should throw an exception.
 
-After successful completion of the query, the smart contract should respond with a message 0x80000000
-
-`<b 0x80000000 32 u, query_id 64 u, query_op 32 u, b>`
+After successful completion of the query, the smart contract should send event message to token recipient.
 
 If operation is unsupported, the smart contract should respond with a message 0xffffffff.
 
@@ -83,18 +99,23 @@ If operation is unsupported, the smart contract should respond with a message 0x
 
 `op = 1`
 
-`<b 1 32 u, query_id 64 u, to_addr addr, value Gram, b>`
+`<b 1 32 u, query_id 64 u, to_addr addr, value Gram, .. payload  b>`
 
 Transfers 'value' amount of tokens to address 'to_addr'. The function SHOULD throw if the message caller’s account balance does not have enough tokens to spend.
 
 Note Transfers of 0 values MUST be treated as normal transfers.
 
+'payload' is optional extra data.
+
+After completion an event message is sent to 'to_addr'.
+
+`<b 0x20000001 32 u, query_id 64 u, sender addr, value Gram, .. payload b>`
 
 ### transfer_from
 
 `op = 2`
 
-`<b 2 32 u, query_id 64 u, from_addr addr, to_addr addr, value Gram, b>`
+`<b 2 32 u, query_id 64 u, from_addr addr, to_addr addr, value Gram, .. payload b>`
 
 Transfers 'value' amount of tokens from address 'from_addr' to address 'to_addr'.
 
@@ -102,23 +123,51 @@ The transfer_from method is used for a withdraw workflow, allowing contracts to 
 
 Note Transfers of 0 values MUST be treated as normal transfers.
 
+'payload' is optional extra data.
+
+After completion an event message is sent to 'to_addr'.
+
+`<b 0x20000002 32 u, query_id 64 u, sender addr, value Gram, .. payload b>`
+
 ### approve
 
 `op = 3`
 
-`<b 3 32 u, query_id 64 u, spender_addr addr, value Gram, b>`
+`<b 3 32 u, query_id 64 u, spender_addr addr, value Gram, .. payload b>`
 
 Allows 'spender' to withdraw from your account multiple times, up to the 'value' amount. If this function is called again it overwrites the current allowance with 'value'.
 
 NOTE: To prevent attack vectors like the one [described here](https://docs.google.com/document/d/1YLPtQxZu1UAvO9cZ1O2RPXBbT0mooh4DYKjA_jp-RLM/), contract REQUIRES set the allowance first to 0 before setting it to another value for the same spender.
 
+'payload' is optional extra data.
+
+After completion an event message is sent to 'spender_addr'.
+
+`<b 0x20000003 32 u, query_id 64 u, sender addr, new_allowance Gram, .. payload b>`
+
 ### increase/decrease allowance
 
 `op = 4`
 
-`<b 4 32 u, query_id 64 u, is_decrease 1 u, spender_addr addr, delta_value Gram, b>`
+`<b 4 32 u, query_id 64 u, is_decrease 1 u, spender_addr addr, delta_value Gram, .. payload b>`
 
 Atomically increase/decrease the allowance by 'delta_value', granted to 'spender' by the caller. This is an alternative to 'approve' method.  
+
+'payload' is optional extra data.
+
+After completion an event message is sent to 'spender_addr'.
+
+`<b 0x20000003 32 u, query_id 64 u, sender addr, new_allowance Gram, .. payload b>`
+
+### Rollback
+
+If the transfer recipient sends a 0xffffffff response (the operation is not supported) or if a bounced message arrives (an error occurred on the recipient side): 
+
+* If message was a transfer: transfer must be returned (equivalent of transfer from receiver to sender).
+
+* If message was a transfer_from: sent tokens must be approved in favor sender (equivalent receiver approves tokens in favor sender).
+
+This prevents the loss of tokens sent to a contract that does not support them.
 
 ### Implementation
 
@@ -173,3 +222,26 @@ This implementation works with addresses in the following format: 8bit int wc , 
 For convenience, you can create queries by sending simple messages with text comment to token smart contract.
 In this case, the comment text should contain the hex of the message body (produced by 'csr.' fift command).
 
+## Discussion
+
+---
+
+Zero Address
+
+Some ERC20 implementations (e.g. OpenZeppelin) require that the destination address not be 0, because "As @zmitton suggested, keeping the require(to != address(0)) in place will prevent bad software that cause empty arg or improper address parsing from sending the funds into the void" [(link)](https://github.com/OpenZeppelin/openzeppelin-contracts/issues/1493).
+
+I believe that bad software should be fixed, instead of adding checks to the contract.
+
+## References
+
+ERC-20
+
+ERC-223
+
+ERC-777
+
+EIP-677 
+
+EIP-827
+
+EIP-1376

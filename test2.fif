@@ -75,7 +75,7 @@ b> storage !
  90191 code <s storage @ runvm
  finish_run print_result exit_grace
 
- // action = 3 - increase approve
+ // action = 4 - increase approve
 
   0
 
@@ -86,7 +86,7 @@ b> storage !
   90191 code <s storage @ runvm
   finish_run print_result exit_grace
 
-  // action = 3 - decrease approve
+  // action = 4 - decrease approve
 
   0
 

@@ -42,13 +42,24 @@ b> storage !
  124838 code <s storage @ runvm
  finish_run print_result exit_grace
 
-// action = 2 - transfer bounced
+// transfer bounced
 
  0
 
  <b  0 1 i, b{001100} s, owner_addr addr, 3 Gram, b>
 
- <b 0x20000000 32 u, 0 64 u, 1 32 u, owner_addr addr, owner_addr addr, 2 Gram,  b> <s
+ <b 0x20000000 32 u, 0 64 u, owner_addr addr, 2 Gram,  b> <s
+
+ 90191 code <s storage @ runvm
+ finish_run print_result exit_grace
+
+// unsupported transfer response
+
+ 0
+
+ <b  0 1 i, b{000100} s, owner_addr addr, 3 Gram, b>
+
+ <b 0xffffffff 32 u, 0 64 u, 0x20000000 32 u, owner_addr addr, 2 Gram,  b> <s
 
  90191 code <s storage @ runvm
  finish_run print_result exit_grace
