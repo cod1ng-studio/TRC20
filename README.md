@@ -33,9 +33,9 @@ At the same time TRC20 corrects ERC20 weaknesses:
 
 * You can not add additional data to the transfer.
 
-* If you send a token to a smart contract that does not support tokens, then we will lose them.
+* If you send a token to a smart contract that does not support tokens, then you will lose them.
 
-* The token sending style is different from the blockchain transaction sending style
+* The token sending style is different from the blockchain transaction sending style.
 
 TRC20 corrects all these flaws, more in the following paragraphs.
 
@@ -47,23 +47,17 @@ TRC20 corrects all these flaws, more in the following paragraphs.
 
 Returns the name of the token - e.g. "MyToken".
 
-OPTIONAL - This method can be used to improve usability, but interfaces and other contracts MUST NOT expect these values to be present.
-
 `slice get_name()`
 
 ### get_symbol
 
 Returns the symbol of the token. E.g. “HIX”.
 
-OPTIONAL - This method can be used to improve usability, but interfaces and other contracts MUST NOT expect these values to be present.
-
 `slice get_symbol()`
 
 ### get_decimals
 
 Returns the number of decimals the token uses - e.g. 8, means to divide the token amount by 100000000 to get its user representation.
-
-OPTIONAL - This method can be used to improve usability, but interfaces and other contracts MUST NOT expect these values to be present.
 
 `int get_decimals()`
 
@@ -223,8 +217,6 @@ For convenience, you can create queries by sending simple messages with text com
 In this case, the comment text should contain the hex of the message body (produced by 'csr.' fift command).
 
 ## Discussion
-
----
 
 Zero Address
 
