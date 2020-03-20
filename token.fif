@@ -295,7 +295,8 @@ PROGRAM{
     STGRAMS
     STDICT
     STDICT
-    1 STU
+    OVER
+    STUX
     ENDC
     c4 POP
   }>
@@ -464,7 +465,7 @@ PROGRAM{
     c4 PUSH
     load_data CALLDICT
     s9 PUSH
-    29 PUSHPOW2
+    536870913 PUSHINT
     EQUAL
     IF:<{
       s9 POP
@@ -578,7 +579,7 @@ PROGRAM{
       s3 s11 s2 XCPU2
       s3 PUSH
       ~transfer CALLDICT
-      29 PUSHPOW2
+      536870913 PUSHINT
     }>ELSE<{
       s11 PUSH
       2 EQINT
@@ -645,7 +646,7 @@ PROGRAM{
             s0 s12 s12 XCHG3
             ~increase_allowance CALLDICT
             s2 s10 XCHG
-            536870916 PUSHINT
+            536870915 PUSHINT
             s10 s1 s10 XCHG3
             s3 s3 XCHG2
           }>
