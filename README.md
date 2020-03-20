@@ -161,6 +161,8 @@ If the transfer recipient sends a 0xffffffff response (the operation is not supp
 
 * If message was a transfer_from: sent tokens must be approved in favor sender (equivalent receiver approves tokens in favor sender).
 
+NOTE: the response must contain the body of the original message.
+
 This prevents the loss of tokens sent to a contract that does not support them.
 
 ### Implementation
