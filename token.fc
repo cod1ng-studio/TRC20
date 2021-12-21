@@ -19,6 +19,16 @@ int gas_to_coins(int workchain, int gas) inline_ref {
   return (gas * gas_price) >> 16;
 }
 
+int msg_fwd_price(int workchain, int cells, int bits) inline_ref {
+  int config_index = 25 + workchain;
+  var cs = config_param(config_index).begin_parse();
+  int tag = cs~load_uint(8);
+  throw_unless(71, tag == 0xea); 
+  int lump_price = cs~load_uint(64);
+  int bit_price = cs~load_uint(64);
+  int cell_price = cs~load_uint(64);
+  return lump_price + ( (cells * cell_price + bits * bit_price) >> 16);
+}
 
 slice pack_addr(int wc, slice addr) {
   return begin_cell().store_int(wc, 8).store_slice(addr).end_cell().begin_parse();
@@ -242,9 +252,14 @@ int _get_allowance(cell allowances, slice owner, slice spender) {
 
   store_data(name, symbol, decimals, total_supply, balances, allowances);
   ;; ensure that receipt carries at least 10k gas
-  throw_unless(111, msg_value - storage_fee > gas_to_coins(gas_limit + 10000, chain_id));
   (int cells, int bits, int refs) = cs.slice_compute_data_size(10);
-  throw_if(112, bits > 8096);
+  ;; msg value has enough coins to pay for 
+  ;;  1) storing cells created during tx plus
+  ;;  2) this tx gas costs
+  ;;  3) 10k gas for processing of outcoming message
+  ;;  4) forward fee for outcoming message
+  throw_unless(111, msg_value > storage_fee + gas_to_coins(chain_id, gas_limit + 10000) + msg_fwd_price(cells, bits, chain_id));
+  
   send_receipt(to,
                action | 0x80000000, query_id,
                sender,
