@@ -5,7 +5,7 @@ builder store_builder_ref(builder to, builder what) asm(what to) "STBREFR";
 (slice, int) dict_get?(cell dict, int key_len, slice index) asm(index dict key_len) "DICTGET" "NULLSWAPIFNOT";
 
 global int operational_balance;
-int cell_storage_fee() asm "10000000 PUSHINT";
+int cell_storage_fee() asm "10000000 PUSHINT"; ;; 0.01 TON
 
 int gas_to_coins(int workchain, int gas) inline_ref {
   int config_index = 21 + workchain;
@@ -69,7 +69,7 @@ int _get_balance(cell balances, slice address) {
 }
 
 (cell, ()) ~set_balance(cell balances, slice address, int value) {
-  throw_unless(100, value < 0);  ;; Explicit error code
+  throw_if(100, value < 0);  ;; Explicit error code
   if(value > 0) {
     balances~dict_set_builder(264, address, begin_cell().store_grams(value));
   } else {
@@ -202,7 +202,7 @@ int _get_allowance(cell allowances, slice owner, slice spender) {
   slice sender = pack_addr(sender_wc, sender_addr);
 
   cs = in_msg;
-  if (cs.slice_bits() == 0) {  ;; just accept grams
+  if (cs.slice_bits() == 0) {  ;; just accept coins
     return ();
   }
 
@@ -271,31 +271,10 @@ int _get_allowance(cell allowances, slice owner, slice spender) {
 }
 
 ;; Returns the name of the token.
-slice get_name() method_id {
+(slice, slice, int, int) get_data() method_id {
   (slice name, slice symbol, int decimals, int total_supply, cell balances, cell allowances) = load_data(get_data());
 
-  return name;
-}
-
-;; Returns the symbol of the token.
-slice get_symbol() method_id {
-  (slice name, slice symbol, int decimals, int total_supply, cell balances, cell allowances) = load_data(get_data());
-
-  return symbol;
-}
-
-;; Returns the number of decimals the token uses.
-int get_decimals() method_id {
-  (slice name, slice symbol, int decimals, int total_supply, cell balances, cell allowances) = load_data(get_data());
-
-  return decimals;
-}
-
-;; Returns the total token supply.
-int get_total_supply() method_id {
-  (slice name, slice symbol, int decimals, int total_supply, cell balances, cell allowances) = load_data(get_data());
-
-  return total_supply;
+  return (name, symbol, decimals, total_supply);
 }
 
 ;; Returns the account balance of another account with address _owner.
