@@ -4,7 +4,6 @@ builder store_builder_ref(builder to, builder what) asm(what to) "STBREFR";
 (cell, int) dict_delete?(cell dict, int key_len, slice index) asm(index dict key_len) "DICTDEL";
 (slice, int) dict_get?(cell dict, int key_len, slice index) asm(index dict key_len) "DICTGET" "NULLSWAPIFNOT";
 
-global int operational_balance;
 int cell_storage_fee() asm "10000000 PUSHINT"; ;; 0.01 TON
 
 int gas_to_coins(int workchain, int gas) inline_ref {
@@ -132,7 +131,7 @@ int _get_allowance(cell allowances, slice owner, slice spender) {
                 int action, int query_id,
                 slice address,
                 int sign, int value,
-                int additional_reserve,
+                int reserve,
                 builder payload) impure {
   ;; int_msg_info ihr_disabled:1 bounce:1 bounced:0 src:MsgAddress -> 011000
   var msg = begin_cell()
@@ -151,7 +150,9 @@ int _get_allowance(cell allowances, slice owner, slice spender) {
   } else {
     msg = msg.store_builder(payload);
   }
-  raw_reserve(operational_balance + additional_reserve, 0);
+  if reserve {
+    raw_reserve(reserve, 0);
+  }
   send_raw_message(msg.end_cell(), 128);
 }
 
@@ -189,7 +190,6 @@ int _get_allowance(cell allowances, slice owner, slice spender) {
 }
 
 () recv_internal(int msg_value, cell in_msg_cell, slice in_msg) impure {
-  operational_balance = pair_first(get_balance()) - msg_value;
   (int chain_id, _) = parse_std_addr(my_address());
 
   slice cs = in_msg_cell.begin_parse();
@@ -263,7 +263,8 @@ int _get_allowance(cell allowances, slice owner, slice spender) {
   send_receipt(to,
                action | 0x80000000, query_id,
                sender,
-               sign, value, storage_fee,
+               sign, value, 
+               pair_first(get_balance()) - msg_value + storage_fee,
                begin_cell().store_slice(cs));
 }
 
