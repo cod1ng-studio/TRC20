@@ -29,8 +29,8 @@ int msg_fwd_price(int workchain, int cells, int bits) inline_ref {
   return lump_price + ( (cells * cell_price + bits * bit_price) >> 16);
 }
 
-slice pack_addr(int wc, slice addr) {
-  return begin_cell().store_int(wc, 8).store_slice(addr).end_cell().begin_parse();
+slice pack_addr(int wc, int addr) inline {
+  return begin_cell().store_int(wc, 8).store_uint(addr, 256).end_cell().begin_parse();
 }
 
 (slice, slice, int, int, cell, cell) load_data(cell data) {
@@ -58,7 +58,7 @@ slice pack_addr(int wc, slice addr) {
   );
 }
 
-int _get_balance(cell balances, slice address) {
+int _get_balance(cell balances, slice address) inline {
   (slice balance_slice, int found) = balances.dict_get?(264, address);
   if (found) {
     return balance_slice~load_grams();
@@ -67,7 +67,7 @@ int _get_balance(cell balances, slice address) {
   }
 }
 
-(cell, ()) ~set_balance(cell balances, slice address, int value) {
+(cell, ()) ~set_balance(cell balances, slice address, int value) inline {
   throw_if(100, value < 0);  ;; Explicit error code
   if(value > 0) {
     balances~dict_set_builder(264, address, begin_cell().store_grams(value));
@@ -77,7 +77,7 @@ int _get_balance(cell balances, slice address) {
   return (balances, ());
 }
 
-int _get_allowance(cell allowances, slice owner, slice spender) {
+int _get_allowance(cell allowances, slice owner, slice spender) inline {
   (slice owner_slice, int owner_found) = allowances.dict_get?(264, owner);
   if (owner_found) {
     cell dict = owner_slice~load_dict();
@@ -198,7 +198,7 @@ int _get_allowance(cell allowances, slice owner, slice spender) {
     return ();
   }
   slice sender_raw = cs~load_msg_addr();
-  (int sender_wc, slice sender_addr) = parse_var_addr(sender_raw);
+  (int sender_wc, int sender_addr) = parse_std_addr(sender_raw);
   slice sender = pack_addr(sender_wc, sender_addr);
 
   cs = in_msg;
@@ -272,7 +272,7 @@ int _get_allowance(cell allowances, slice owner, slice spender) {
 }
 
 ;; Returns the name of the token.
-(slice, slice, int, int) get_data() method_id {
+(slice, slice, int, int) get_token_data() method_id {
   (slice name, slice symbol, int decimals, int total_supply, cell balances, cell allowances) = load_data(get_data());
 
   return (name, symbol, decimals, total_supply);
